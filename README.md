@@ -13,7 +13,7 @@ parakeet-redux-wasm is the app around the model: a [fusor](https://github.com/fu
 
 **In development · v0.1**: this is experimental software. See [status and known limitations](#status-and-known-limitations).
 
-[Run it](#run-it-locally) · [How it works](#how-it-works) · [How fast is it](#how-fast-is-it) · [Benchmarks](benchmarks.md) · [Status](#status-and-known-limitations) · [Contributing](CONTRIBUTING.md)
+[Run it](#run-it-locally) · [Try it online](#try-it-online) · [How it works](#how-it-works) · [How fast is it](#how-fast-is-it) · [Benchmarks](benchmarks.md) · [Status](#status-and-known-limitations) · [Contributing](CONTRIBUTING.md)
 
 ## Run it locally
 
@@ -27,6 +27,10 @@ just ui
 and open the address it prints. That's all: `just ui` installs the pinned tools (the threads toolchain with rustup; wasm-bindgen, binaryen and the fusor CLI into `.tools/`), downloads the checkpoint at a pinned revision (178 MB, each file sha256-checked), compiles it into a 199 MB bundle, builds the four browser runtimes (a few minutes the first time, seconds after) and the page, and serves it on `http://localhost:8787` with the bundle beside it.
 
 Press **Listen**, even while the model is still loading: the audio is kept and transcribed the moment the model is ready. The words appear as you speak; the latest ones are provisional, shown lighter, until a pause makes them final. **Transcribe a file** reads any recording the browser can decode, cut at its pauses into segments of at most 30 s. Every run is measured live: the real-time factor, the delay from audio to its text, the audio transcribed, the words, and the network requests since the model loaded, which stay at zero.
+
+## Try it online
+
+Open [parakeet-stt.fusor.build](https://parakeet-stt.fusor.build) in Chrome or Edge. The page downloads the 199 MB model once and keeps it in the browser's storage, so the next visit loads in under a second. The same page runs as a Hugging Face Space, [fusorlabs/parakeet-redux-wasm](https://huggingface.co/spaces/fusorlabs/parakeet-redux-wasm).
 
 ## More ways to run it
 
