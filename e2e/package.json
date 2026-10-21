@@ -1,0 +1,7 @@
+{
+  "name": "parakeet-redux-wasm-e2e",
+  "private": true,
+  "type": "module",
+  "description": "Headless Chrome runs of the Parakeet Redux page: load, listen, transcribe, check the text",
+  "dependencies": { "playwright": "1.64.1" }
+}

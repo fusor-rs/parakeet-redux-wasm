@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Parakeet Redux · speech to text in your browser</title>
+  <meta name="description" content="Moondream's Parakeet Redux running on this device's CPU, compiled to WebAssembly with fusor-ai. Your audio never leaves the page.">
+  <link rel="icon" href="/brand/parakeet.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/app.css">
+</head>
+<body>
+  <App state="{{ App::new() }}">
+    <script type="module" src="./app.js"></script>
+    <main on:engine="state.receive(event)" data-phase="{{ state.phase.get().name() }}" data-loaded="{{ state.loaded.get().is_some() }}">
+      <header class="masthead">
+        <div class="lockup">
+          <img src="/brand/fusor-ai.svg" alt="fusor-ai" width="40" height="40">
+          <span class="times" aria-hidden="true">×</span>
+          <img src="/brand/parakeet.svg" alt="" width="36" height="36">
+          <span class="wordmark">Parakeet Redux</span>
+        </div>
+        <h1>Speech to text, transcribed on your own CPU</h1>
+        <p class="lede">Moondream's Parakeet Redux, NVIDIA's parakeet-tdt-0.6b-v3 with 1.58-bit weights, compiled to WebAssembly with fusor-ai. It writes down 25 European languages as you speak, or a recording you pick, and once loaded, no audio leaves the page.</p>
+      </header>
+
+      <If condition="{{ state.loading() }}">
+        <section class="card loading" aria-live="polite">
+          <div class="row"><strong>Loading the model</strong><span id="detail" class="muted">{{ state.detail.get() }}</span></div>
+          <progress max="1" value="{{ state.fraction.get() }}"></progress>
+        </section>
+      </If>
+
+      <If condition="{{ state.phase.get() == Phase::Broken }}">
+        <section class="card broken" role="alert">
+          <strong>{{ if state.failed_to_load() { "The model could not load" } else { "The engine stopped" } }}</strong>
+          <p id="detail">{{ state.detail.get() }}</p>
+          <If condition="{{ state.failed_to_load() }}">
+            <p class="muted">A bundle loads only into the runtime built with it. If you built this page yourself, rebuild both with <code>just ui</code>.</p>
+          </If>
+          <div class="row"><a id="reload" class="control primary" href="">Reload</a></div>
+        </section>
+      </If>
+
+      <section class="card capture" data-phase="{{ state.phase.get().name() }}">
+        <div class="row">
+          <button id="listen" type="button" class="control primary" disabled="{{ !state.idle() }}" on:click="state.listen()"><span class="dot" aria-hidden="true"></span>{{ state.listen_label() }}</button>
+          <label id="pick" class="control" data-disabled="{{ !state.idle() }}">Transcribe a file<input id="file" type="file" accept="audio/*,video/*" disabled="{{ !state.idle() }}" on:change="state.choose()"></label>
+          <button id="stop" type="button" class="control" disabled="{{ !state.can_stop() }}" on:click="state.stop()">Stop</button>
+        </div>
+        <canvas id="wave" aria-label="Level of the audio being transcribed"></canvas>
+        <span id="status" class="muted" aria-live="polite">{{ state.status.get() }}</span>
+      </section>
+
+      <If condition="{{ state.measured.get() }}">
+        <section class="card transcript">
+          <div class="sentences" aria-live="polite">
+            <div class="lines">
+              <ForEach items="{{ state.lines.get() }}" key="{{ |line| line.id }}">
+                <p class="sentence"><time title="{{ item.get().span() }}">{{ item.get().time() }}</time><span>{{ item.get().sentence.text }}</span></p>
+              </ForEach>
+            </div>
+            <div class="lines provisional">
+              <ForEach items="{{ state.provisional.get() }}" key="{{ |line| line.id }}">
+                <p class="sentence"><time title="{{ item.get().span() }}">{{ item.get().time() }}</time><span>{{ item.get().sentence.text }}</span></p>
+              </ForEach>
+            </div>
+            <If condition="{{ state.empty() }}">
+              <p class="muted placeholder">The words appear here as they are recognized.</p>
+            </If>
+          </div>
+          <dl class="metrics">
+            <div><dt>RTF</dt><dd id="rtf">{{ state.metrics.get().real_time_factor() }}</dd><dd class="muted">{{ state.metrics.get().speedup() }}</dd></div>
+            <div><dt>Delay</dt><dd id="delay">{{ state.metrics.get().delay() }}</dd><dd class="muted">from audio to its text</dd></div>
+            <div><dt>Audio</dt><dd id="audio-seconds">{{ state.metrics.get().audio() }}</dd><dd class="muted">transcribed</dd></div>
+            <div><dt>Words</dt><dd id="words">{{ state.words() }}</dd><dd class="muted">so far</dd></div>
+            <div><dt>Network</dt><dd id="requests">{{ state.metrics.get().requests() }}</dd><dd class="muted">requests since the model loaded</dd></div>
+          </dl>
+          <div class="row"><button id="copy" type="button" class="control" disabled="{{ state.empty() }}" on:click="state.copy()">Copy text</button></div>
+        </section>
+      </If>
+
+      <footer class="muted">
+        <span id="runtime">{{ state.summary() }}</span>
+        <span>Built with <a href="https://github.com/fusor-rs/fusor-ai">fusor-ai</a> and <a href="https://fusor.build">fusor</a> · model: <a href="https://huggingface.co/moondream/parakeet-redux">Moondream Parakeet Redux</a>, from NVIDIA's <a href="https://huggingface.co/nvidia/parakeet-tdt-0.6b-v3">parakeet-tdt-0.6b-v3</a> (CC-BY-4.0) · <a href="https://github.com/fusor-rs/parakeet-redux-wasm">source</a></span>
+      </footer>
+    </main>
+  </App>
+</body>
+</html>

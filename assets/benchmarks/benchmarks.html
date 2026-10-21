@@ -1,0 +1,124 @@
+<!doctype html>
+<!--
+  The README's benchmark summary: parakeet-redux-wasm in Chrome and against Moondream's Photon
+  natively, from benchmarks.md. Rendered at 1400×1090, twice the pixels, by
+  `node scripts/render-images.mjs` into benchmarks.png and benchmarks-dark.png (`?theme=dark`).
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<style>
+  :root {
+    --canvas: #faf9f6; --card: #ffffff; --ink: #272a2c; --soft: #5c5f61; --faint: #8b8d8d;
+    --hairline: #e3e0d9; --ours: #df5036; --theirs: #3f78b5;
+  }
+  :root.dark {
+    --canvas: #121314; --card: #1a1b1c; --ink: #f2f1ed; --soft: #b4b5b3; --faint: #8b8d8d;
+    --hairline: #303335; --ours: #e8603f; --theirs: #4a87d0;
+  }
+  html, body { margin: 0; }
+  body {
+    width: 1400px; height: 1090px; box-sizing: border-box; padding: 56px 64px;
+    background: var(--canvas); color: var(--ink);
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-variant-numeric: tabular-nums;
+  }
+  header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 32px; }
+  h1 { margin: 0; font-size: 36px; letter-spacing: -0.02em; }
+  header p { margin: 8px 0 0; font-size: 19px; color: var(--soft); }
+  .legend { display: flex; flex-direction: column; gap: 10px; font-size: 19px; }
+  .legend span { display: flex; align-items: center; gap: 10px; }
+  .legend i { width: 18px; height: 18px; border-radius: 4px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .panel { background: var(--card); border: 1px solid var(--hairline); border-radius: 16px; padding: 24px 28px; }
+  .panel h2 { margin: 0; font-size: 22px; letter-spacing: -0.01em; }
+  .panel .unit { margin: 4px 0 0; font-size: 16px; color: var(--faint); }
+  .verdict { margin: 12px 0 18px; font-size: 19px; font-weight: 600; }
+  .verdict.loss { color: var(--soft); }
+  .group { display: grid; grid-template-columns: 112px 1fr; align-items: center; column-gap: 12px; margin-top: 12px; }
+  .group > b { font-size: 16px; font-weight: 500; color: var(--soft); }
+  .bars { display: flex; flex-direction: column; gap: 2px; }
+  .row { display: flex; align-items: center; gap: 10px; height: 22px; font-size: 16px; }
+  .bar { height: 22px; border-radius: 0 4px 4px 0; }
+  .row.none { color: var(--faint); font-style: italic; }
+  .stat { display: flex; align-items: baseline; gap: 16px; margin-top: 18px; }
+  .stat b { font-size: 72px; letter-spacing: -0.04em; line-height: 1; }
+  .stat span { font-size: 19px; color: var(--soft); line-height: 1.4; }
+  footer { margin-top: 22px; font-size: 15px; color: var(--faint); line-height: 1.5; }
+</style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>parakeet-redux-wasm, in Chrome and against Photon</h1>
+      <p>The same model, Moondream Parakeet Redux, on one Apple M4 Pro; shorter bars are better.</p>
+    </div>
+    <div class="legend">
+      <span><i style="background: var(--ours)"></i>parakeet-redux-wasm (fusor-ai)</span>
+      <span><i style="background: var(--theirs)"></i>Moondream's Photon</span>
+    </div>
+  </header>
+  <div class="grid" id="grid"></div>
+  <footer>
+    Chrome: the 116 s recording (ten LibriSpeech utterances), transcribed as a file and listened to through the page.
+    Native: the CLI and Photon on all 74 recordings with the same thread counts, measured while other work loaded the machine.
+    Full tables, methods and caveats: benchmarks.md.
+  </footer>
+<script>
+  const PANELS = [
+    {
+      title: 'Speed in Chrome, on the CPU', unit: 'Real-time factor: compute time ÷ audio length',
+      verdict: '7× faster than real time on one thread, 42× on eight', format: (v) => v.toFixed(3),
+      none: 'Photon has no browser build',
+      groups: [['1 thread', 0.141, null], ['8 threads', 0.024, null]],
+    },
+    {
+      title: 'Speed as a native app', unit: 'Real-time factor: compute time ÷ audio length',
+      verdict: 'Photon is 1.5× faster on one thread, 2.2× on eight', loss: true, format: (v) => v.toFixed(3),
+      groups: [['1 thread', 0.096, 0.063], ['8 threads', 0.045, 0.021]],
+    },
+    {
+      title: 'Listening in Chrome', unit: 'Seconds from the words to their text, on average',
+      verdict: 'The text follows the speech', format: (v) => `${v.toFixed(2)} s`,
+      none: 'Photon has no browser build',
+      groups: [['1 thread', 0.70, null], ['8 threads', 0.15, null]],
+    },
+    {
+      title: 'Word error rate', unit: 'Percent, LibriSpeech references, the same normalization',
+      verdict: 'Within a quarter of a point', loss: true, format: (v) => `${v.toFixed(2)}%`,
+      groups: [['74 recordings', 4.49, 4.27]],
+    },
+    {
+      title: 'Download', unit: 'Megabytes: the model',
+      verdict: '12% larger: two bits a weight against 1.6', loss: true, format: (v) => `${v} MB`,
+      groups: [['Weights', 198.8, 177.8]],
+    },
+  ];
+
+  const grid = document.getElementById('grid');
+  const row = (value, color, scale, panel) => value === null
+    ? `<div class="row none">${panel.none}</div>`
+    : `<div class="row"><div class="bar" style="width:${(value / scale) * 100}%;background:${color}"></div>${panel.format(value)}</div>`;
+
+  for (const panel of PANELS) {
+    const scale = Math.max(...panel.groups.flatMap(([, ours, theirs]) => [ours, theirs ?? 0])) * 1.32;
+    const groups = panel.groups.map(([label, ours, theirs]) => `
+      <div class="group"><b>${label}</b><div class="bars">
+        ${row(ours, 'var(--ours)', scale, panel)}${row(theirs, 'var(--theirs)', scale, panel)}
+      </div></div>`).join('');
+    grid.insertAdjacentHTML('beforeend', `
+      <section class="panel">
+        <h2>${panel.title}</h2><p class="unit">${panel.unit}</p>
+        <p class="verdict${panel.loss ? ' loss' : ''}">${panel.verdict}</p>${groups}
+      </section>`);
+  }
+  grid.insertAdjacentHTML('beforeend', `
+    <section class="panel">
+      <h2>Agreement with Moondream's engine</h2><p class="unit">Every stage against kestrel 0.9.1's f32 goldens</p>
+      <div class="stat"><b>87/87</b><span>decoder decisions identical;<br>features to encoder within 4·10⁻⁶</span></div>
+    </section>`);
+
+  if (new URLSearchParams(location.search).get('theme') === 'dark') document.documentElement.classList.add('dark');
+</script>
+</body>
+</html>
