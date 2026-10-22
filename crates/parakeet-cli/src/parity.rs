@@ -8,7 +8,9 @@
 use std::path::Path;
 
 use anyhow::{Result, ensure};
+use bundle::Stages as _;
 use compile::Checkpoint;
+use harness::parity::compare;
 use parakeet::Step;
 use parakeet::model::MELS;
 use parakeet::pipeline::Stage;
@@ -52,39 +54,6 @@ impl Goldens {
     }
 }
 
-fn relative_l2(ours: &[f32], reference: &[f32]) -> f64 {
-    let diff: f64 = ours
-        .iter()
-        .zip(reference)
-        .map(|(value, want)| f64::from(value - want).powi(2))
-        .sum();
-    let norm: f64 = reference.iter().map(|want| f64::from(*want).powi(2)).sum();
-    (diff / norm).sqrt()
-}
-
-fn max_abs(ours: &[f32], reference: &[f32]) -> f32 {
-    ours.iter()
-        .zip(reference)
-        .map(|(value, want)| (value - want).abs())
-        .fold(0.0, f32::max)
-}
-
-/// `name: rel …, max abs …` after checking that both have `len` values.
-fn compare(name: &str, ours: &[f32], reference: &[f32]) -> Result<String> {
-    ensure!(
-        ours.len() == reference.len(),
-        "{name}: {} values, reference {}",
-        ours.len(),
-        reference.len()
-    );
-    Ok(format!(
-        "{name}: {} values, rel {:.2e}, max abs {:.2e}",
-        ours.len(),
-        relative_l2(ours, reference),
-        max_abs(ours, reference)
-    ))
-}
-
 pub fn run(engine: &mut Engine, goldens: &Path) -> Result<()> {
     let goldens = Goldens::read(goldens)?;
     let ours = engine.features(&goldens.pcm)?;
@@ -92,7 +61,7 @@ pub fn run(engine: &mut Engine, goldens: &Path) -> Result<()> {
     let frames = ours.len() / MELS;
     let seconds = goldens.pcm.len() as f64 / f64::from(parakeet::SAMPLE_RATE);
     println!("{seconds:.2}s of audio, {frames} mel frames");
-    for stage in Stage::ALL {
+    for &stage in Stage::ALL {
         let report = match stage {
             Stage::Features => compare("features", &ours, features)?,
             Stage::Subsampling => compare(
