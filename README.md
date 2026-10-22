@@ -118,7 +118,7 @@ A cloud API sends your audio to a server and bills per minute. parakeet-redux-wa
 
 ## Contributing
 
-parakeet-redux-wasm is an open source project in early development. The [contributing guide](CONTRIBUTING.md) covers the setup, checks and workflow. The runtime and the CLI live in `crates/` and the page in `app/`; the model and its toolkit come from fusor-ai, its crates from crates.io and its browser scripts from `vendor/fusor-ai`.
+parakeet-redux-wasm is an open source project in early development. The [contributing guide](CONTRIBUTING.md) covers the setup, checks and workflow. The runtime and the CLI live in `crates/` and the page in `app/`; the model and its toolkit come from fusor-ai, its crates and browser scripts from the `vendor/fusor-ai` submodule.
 
 parakeet-redux-wasm is built with the help of AI tools, mainly Claude Code, under the same rules the project asks of contributors: see [Using AI tools](CONTRIBUTING.md#using-ai-tools).
 

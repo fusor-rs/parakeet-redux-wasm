@@ -30,9 +30,9 @@ the task.
   run; `benchmarks/`: the comparisons with other Parakeet runtimes.
 - [fusor-ai](https://github.com/fusor-rs/fusor-ai): the model (`parakeet`), its
   compiler (`parakeet-compile`), the kernels, blocks and bundle format come from
-  crates.io as `fusor-ai-*` crates; `vendor/fusor-ai`, a git submodule at the
-  same release, supplies what crates.io does not carry: the browser loader and
-  compute pool, the runtime build, the import check and the dev server.
+  `vendor/fusor-ai`, a git submodule pinned to a commit pushed to fusor-ai, with
+  the browser loader and compute pool, the runtime build, the import check and
+  the dev server.
 
 What belongs where: model code (dimensions, tensor names, wiring, the audio
 frontend, the decoder and its vocabulary) and anything another model could reuse
@@ -57,14 +57,11 @@ Constraints that hold everywhere:
   entropy. fusor-ai's `scripts/check-wasm-imports.mjs` is the check (`just
   runtimes` runs it on every build); never widen its allowlists to make a build
   pass.
-- The `fusor-ai-*` versions in `[workspace.dependencies]` and `vendor/fusor-ai`
-  name the same fusor-ai release (the submodule at its `v<version>` tag), and
-  move together in a change of their own, with the parity numbers and the e2e
-  result it gave. `[patch.crates-io]` entries pointing into `vendor/fusor-ai`
-  are for trying an unreleased change locally and never land. No copies of
-  fusor-ai code here. Until fusor-ai publishes `fusor-ai-parakeet`, the model is
-  built in fusor-ai and tried here through such a patch; nothing that needs an
-  unpublished fusor-ai lands here.
+- fusor-ai comes only from `vendor/fusor-ai`: path dependencies in
+  `[workspace.dependencies]`, never a crates.io version, a `[patch]` table or a
+  sibling checkout. The submodule moves to another pushed fusor-ai commit in a
+  change of its own, with the parity numbers and the e2e result it gave. No
+  copies of fusor-ai code here.
 - The page owns every capability: the microphone, decoding audio files and
   resampling them to 16 kHz, caching the bundle (OPFS) and measuring itself. The
   runtime receives PCM and does no I/O. Microphone audio goes from the capture

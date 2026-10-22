@@ -215,8 +215,6 @@ checksum = "1c66915cc5391097de7a2b0b972e8505aa33c0df401fd3a6811dbdb32881ba48"
 [[package]]
 name = "fusor-ai-blocks"
 version = "0.1.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ad99f634f8c4948abce7933d788b10d096eba5d3ce51fc139c4059d49b0bf134"
 dependencies = [
  "fusor-ai-bundle",
  "fusor-ai-kernels",
@@ -227,8 +225,6 @@ dependencies = [
 [[package]]
 name = "fusor-ai-bundle"
 version = "0.1.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "87d7ab0a0a0a74b7a608ac29a36dca47c0a4d5f57ec275b4fa95d7262d2b178b"
 dependencies = [
  "blake3",
  "fusor-ai-kernels",
@@ -240,8 +236,6 @@ dependencies = [
 [[package]]
 name = "fusor-ai-compile"
 version = "0.1.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7c2f6ff5210efba7fb07e80236bb594f054c69b29f8770c81f95e8499dd6e030"
 dependencies = [
  "blake3",
  "fusor-ai-bundle",
@@ -254,8 +248,6 @@ dependencies = [
 [[package]]
 name = "fusor-ai-kernels"
 version = "0.1.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fd8e6cd03404923c1ff425c4806c5f549c49bd5cb3dd661cd36aa8e4e30c9e77"
 dependencies = [
  "fusor-ai-team",
  "serde",
@@ -265,8 +257,6 @@ dependencies = [
 [[package]]
 name = "fusor-ai-parakeet"
 version = "0.1.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d81f8f0183faf060c78cf4caed3b26d6ad9a749a93b2b68c466ce800271438cc"
 dependencies = [
  "fusor-ai-blocks",
  "fusor-ai-bundle",
@@ -280,8 +270,6 @@ dependencies = [
 [[package]]
 name = "fusor-ai-parakeet-compile"
 version = "0.1.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b5460082d8136187226ed1159185e15e9dedff0dc1e47f0da7200a943ed1d037"
 dependencies = [
  "fusor-ai-bundle",
  "fusor-ai-compile",
@@ -294,8 +282,6 @@ dependencies = [
 [[package]]
 name = "fusor-ai-team"
 version = "0.1.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e9fd5c664de6bf2f1f24d4a463a7f2176d282f61cf5b30df8009cee24cc5c4ed"
 dependencies = [
  "rayon",
 ]
