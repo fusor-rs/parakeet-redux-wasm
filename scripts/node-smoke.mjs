@@ -1,11 +1,12 @@
 // Runs a single-threaded wasm runtime build in Node against a bundle: pushes every part the way
 // the browser loader does, then transcribes one recording twice, as a file (cut at its pauses,
 // one segment per step) and as live audio (heard in pieces, updated after each), and prints for
-// each the real-time factor and the word error rate against the recording's reference.
+// each the real-time factor and the word error rate against the recording's reference. With
+// `--out`, each transcript is written to `<dir>/<mode>.txt`.
 //
-//   node scripts/node-smoke.mjs dist/model --build web-single [--recording fixtures/recordings/long.wav]
+//   node scripts/node-smoke.mjs dist/model --build web-single [--recording fixtures/recordings/long.wav] [--out dir]
 
-import { readFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join } from 'node:path';
 import { parseArgs } from 'node:util';
 import { wordErrorRate } from './wer.mjs';
@@ -15,6 +16,7 @@ const { values, positionals } = parseArgs({
   options: {
     build: { type: 'string', default: 'web-single' },
     recording: { type: 'string', default: 'fixtures/recordings/long.wav' },
+    out: { type: 'string' },
   },
 });
 // Live audio arrives in pieces this long, as the page's capture worklet sends it.
@@ -43,12 +45,14 @@ const seconds = pcm.length / glue.sample_rate();
 const references = JSON.parse(readFileSync(join(dirname(values.recording), 'references.json'), 'utf8'));
 const reference = references[basename(values.recording, '.wav')];
 let failed = false;
+if (values.out) mkdirSync(values.out, { recursive: true });
 
 const report = (mode, ms, sentences, detail) => {
   const text = sentences.map((sentence) => sentence.text).join(' ');
   const { rate, errors, words } = wordErrorRate(reference, text);
   console.log(`  ${mode}: ${seconds.toFixed(2)}s of audio in ${(ms / 1000).toFixed(2)}s, RTF ${(ms / 1000 / seconds).toFixed(3)}, ${detail}; WER ${rate.toFixed(4)} (${errors}/${words})`);
   failed ||= !text;
+  if (values.out) writeFileSync(join(values.out, `${mode}.txt`), `${text}\n`);
 };
 
 let t1 = performance.now();
