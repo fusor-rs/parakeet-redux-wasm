@@ -9,12 +9,13 @@ profile := env_var_or_default("PROFILE", "ternary")
 model_f32 := "dist/model-f32"
 goldens := "fixtures/goldens"
 recordings := "fixtures/recordings"
-# The reference the goldens come from (scripts/golden-harness): Moondream's kestrel, pinned.
+# The reference the goldens come from (vendor/fusor-ai/models/parakeet/reference): Moondream's
+# kestrel, pinned.
 reference := "uv run --no-project --python 3.12 --with kestrel==0.9.1 --with torch==2.14.1 --with numpy==2.5.4 --with safetensors==0.8.0 --with soundfile==0.14.0 python"
 
 host:
     bash -n scripts/fetch-checkpoint.sh
-    python3 -m py_compile scripts/recordings.py scripts/golden-harness/dump.py benchmarks/photon.py
+    python3 -m py_compile scripts/recordings.py benchmarks/photon.py
     node --check app/web/app.js
     node --check app/web/waveform.js
     node --check app/engine/worker.js
@@ -42,7 +43,8 @@ ui: model runtimes page serve
 recordings:
     test -f {{recordings}}/references.json || uv run --no-project --python 3.12 --with pyarrow==26.0.0 --with soundfile==0.14.0 python scripts/recordings.py {{recordings}}
 
-# Every stage against the reference's goldens (scripts/golden-harness), with the f32 bundle.
+# Every stage against the reference's goldens (vendor/fusor-ai/models/parakeet/reference), with the
+# f32 bundle.
 parity: native
     test -f {{goldens}}/golden_f32_A.safetensors || just goldens
     scripts/fetch-checkpoint.sh {{checkpoint}}
@@ -54,7 +56,7 @@ parity: native
 goldens: recordings
     scripts/fetch-checkpoint.sh {{checkpoint}}
     mkdir -p {{goldens}}
-    {{reference}} scripts/golden-harness/dump.py {{checkpoint}} {{recordings}}/02.wav {{goldens}}/golden_f32_A.safetensors
+    {{reference}} {{fusor_ai}}/models/parakeet/reference/dump.py {{checkpoint}} {{recordings}}/02.wav {{goldens}}/golden_f32_A.safetensors
 
 bench: native recordings
     target/release/parakeet bench {{model}} {{recordings}}/02.wav

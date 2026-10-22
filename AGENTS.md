@@ -13,11 +13,11 @@ the task.
 
 ## Repository
 
-- `crates/parakeet-runtime`: the wasm-bindgen surface of the model (bundle
-  parts and 16 kHz PCM in, text and timestamps out), built as four browser
-  runtimes.
-- `crates/parakeet-cli`: the native CLI `parakeet` (`compile`, `transcribe`,
-  `bench`, `parity`).
+- `vendor/fusor-ai/models/parakeet/runtime`: the wasm-bindgen surface of the
+  model (bundle parts and 16 kHz PCM in, text and timestamps out), built as four
+  browser runtimes.
+- `vendor/fusor-ai/models/parakeet/cli`: the native CLI `parakeet` (`compile`,
+  `transcribe`, `bench`, `parity`).
 - `app/`: the page, a [fusor](https://github.com/fusor-rs/fusor) app with its own
   Cargo workspace (fusor pins wasm-bindgen 0.2.117, the runtime 0.2.129): the
   form, the loading and the live measurements as Rust signals in `src/app.rs`,

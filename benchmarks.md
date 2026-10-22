@@ -70,7 +70,7 @@ Photon is faster natively: both multiply with the CPU's `sdot`, and its native k
 
 ## Agreement
 
-`just parity` runs every stage, teacher-forced, against goldens from kestrel 0.9.1 with its ternary weights expanded to f32 (`scripts/golden-harness`), on utterance `02` (12.5 s):
+`just parity` runs every stage, teacher-forced, against goldens from kestrel 0.9.1 with its ternary weights expanded to f32 (`vendor/fusor-ai/models/parakeet/reference`), on utterance `02` (12.5 s):
 
 | Stage | Relative L2 |
 |---|---:|

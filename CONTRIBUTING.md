@@ -7,22 +7,21 @@ the head-to-head). Clone with `--recurse-submodules` (or run `just tools`, which
 
 The model, its compiler and the toolkit live in
 [fusor-ai](https://github.com/fusor-rs/fusor-ai). Everything this repository takes from it
-comes from `vendor/fusor-ai`, a submodule pinned to a commit pushed to fusor-ai: the
-`fusor-ai-*` crates, as path dependencies in the root `Cargo.toml`, the browser host scripts,
-the runtime build and the import check. To move to another fusor-ai commit, check it out in the
+comes from `vendor/fusor-ai`, a submodule pinned to a commit pushed to fusor-ai: the model's
+crates in `models/parakeet`, its runtime and CLI among them, the browser host scripts, the
+runtime build and the import check. To move to another fusor-ai commit, check it out in the
 submodule (`git -C vendor/fusor-ai checkout <commit>`) in one change of its own, with the
 checks below. Never add a crates.io pin, a `[patch]` table or a path to a fusor-ai checkout
 beside this one.
 
-Run `just check` before considering a change complete. It formats, tests and lints the crates
-natively, the runtime for `wasm32-unknown-unknown` (SIMD128 and relaxed SIMD) and the page,
-and syntax-checks the scripts. `just ui` builds the page and serves it; the page is a
-[fusor](https://github.com/fusor-rs/fusor) app in `app/`, built with the fusor CLI that
-`just tools` installs into `.tools/`. A change to the runtime, the page, the CLI or fusor-ai
-also needs `just build` once, then `just runtimes`, `just smoke`, `just parity` and
-`just e2e`, and a change meant to move speed `just head-to-head`. Say in the pull request what
-they showed (parity numbers, real-time factor, delay, word error rate) and which fusor-ai commit
-they ran against.
+Run `just check` before considering a change complete. It formats and lints the page and
+syntax-checks the scripts; fusor-ai's own check covers the runtime and the CLI. `just ui`
+builds the page and serves it; the page is a [fusor](https://github.com/fusor-rs/fusor) app in
+`app/`, built with the fusor CLI that `just tools` installs into `.tools/`. A change to the
+runtime, the page, the CLI or fusor-ai also needs `just build` once, then `just runtimes`,
+`just smoke`, `just parity` and `just e2e`, and a change meant to move speed `just
+head-to-head`. Say in the pull request what they showed (parity numbers, real-time factor,
+delay, word error rate) and which fusor-ai commit they ran against.
 
 `just recordings` downloads the fixed recordings the checks transcribe: the 73 LibriSpeech
 dev-clean utterances of `hf-internal-testing/librispeech_asr_dummy` at a pinned revision
@@ -31,7 +30,7 @@ dev-clean utterances of `hf-internal-testing/librispeech_asr_dummy` at a pinned 
 
 `just parity` compares every stage with goldens from the reference runtime, Moondream's kestrel
 (the engine behind Photon) at version 0.9.1 with its ternary weights expanded to f32, which
-`just goldens` makes with `scripts/golden-harness`; `just parity` runs it first when the goldens
+`just goldens` makes with `vendor/fusor-ai/models/parakeet/reference`; `just parity` runs it first when the goldens
 are missing. Parity uses the f32 bundle (`PROFILE=f32`, 2.5 GB, native only).
 
 `just smoke` runs the single-threaded runtimes in Node on `long.wav`, as a file and as live
