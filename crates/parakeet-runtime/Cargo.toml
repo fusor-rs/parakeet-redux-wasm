@@ -13,20 +13,15 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 parakeet.workspace = true
-bundle.workspace = true
-serde.workspace = true
-serde_json.workspace = true
+runtime.workspace = true
 
 [features]
 # Threaded runtimes (vendor/fusor-ai/scripts/build-runtime.sh): the team runs on a wasm-bindgen-rayon pool of
 # page-owned workers sharing this module's memory.
-threads = ["parakeet/threads", "dep:wasm-bindgen-rayon"]
+threads = ["parakeet/threads", "runtime/threads"]
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 wasm-bindgen.workspace = true
-wasm-bindgen-rayon = { workspace = true, optional = true }
-# Not called here: SIMD for the BLAKE3 that checks every part.
-blake3 = { workspace = true, features = ["wasm32_simd"] }
 
 [lints]
 workspace = true

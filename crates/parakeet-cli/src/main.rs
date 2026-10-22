@@ -12,7 +12,7 @@ use std::path::{Path, PathBuf};
 use std::time::Instant;
 
 use anyhow::{Context, Result, ensure};
-use bundle::{Manifest, Store};
+use bundle::{Engine as _, Manifest, Store};
 use clap::{Parser, Subcommand};
 use parakeet::SAMPLE_RATE;
 use parakeet::session::Engine;

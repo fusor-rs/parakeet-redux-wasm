@@ -4,6 +4,7 @@
 use std::time::Instant;
 
 use anyhow::Result;
+use bundle::Engine as _;
 use parakeet::SAMPLE_RATE;
 use parakeet::pipeline::Stage;
 use parakeet::session::Engine;
