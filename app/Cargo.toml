@@ -34,6 +34,7 @@ base-path = "/"
 # The engine worker, the capture worklet and the runtimes `just runtimes` builds next to them.
 "/engine/" = "engine"
 "/brand/fusor-ai.svg" = "../vendor/fusor-ai/assets/brand/fusor-ai.svg"
+"/base.css" = "../vendor/fusor-ai/packages/ui/base.css"
 "/brand/parakeet.svg" = "../assets/brand/parakeet.svg"
 
 [profile.release]
