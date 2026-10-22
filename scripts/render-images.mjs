@@ -1,12 +1,12 @@
-// Renders the README's images, light and dark, with the e2e's Playwright (`cd e2e && npm ci`
-// first): assets/brand/banner.html into banner.png and banner-dark.png, and
-// assets/benchmarks/benchmarks.html into benchmarks.png and benchmarks-dark.png.
+// Renders the README's images and the post image, light and dark, with the e2e's Playwright
+// (`cd e2e && npm ci` first): each page in IMAGES into <name>.png and <name>-dark.png beside it.
 import { chromium } from '../e2e/node_modules/playwright/index.mjs';
 import { fileURLToPath } from 'node:url';
 
 const IMAGES = [
   { page: '../assets/brand/banner.html', width: 1280, height: 400, name: 'banner' },
   { page: '../assets/benchmarks/benchmarks.html', width: 1400, height: 1090, name: 'benchmarks' },
+  { page: '../assets/social/speed.html', width: 1600, height: 900, name: 'speed' },
 ];
 
 const browser = await chromium.launch();

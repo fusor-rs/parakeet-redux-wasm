@@ -1,0 +1,95 @@
+<!doctype html>
+<!--
+  The speed post: the 116 s recording transcribed in Chrome, from benchmarks.md. Rendered at
+  1600×900, twice the pixels, by `node scripts/render-images.mjs` into speed.png and
+  speed-dark.png (`?theme=dark`).
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<style>
+  :root {
+    --canvas: #faf9f6; --card: #ffffff; --ink: #272a2c; --soft: #5c5f61; --faint: #8b8d8d;
+    --hairline: #e3e0d9; --oxide: #a83228; --vermilion: #df5036; --slate: #b9bab9;
+  }
+  :root.dark {
+    --canvas: #121314; --card: #1a1b1c; --ink: #f2f1ed; --soft: #b4b5b3; --faint: #8b8d8d;
+    --hairline: #303335; --oxide: #e8603f; --vermilion: #f08a6c; --slate: #4a4d4f;
+  }
+  html, body { margin: 0; }
+  body {
+    width: 1600px; height: 900px; overflow: hidden; position: relative;
+    background: var(--canvas); color: var(--ink);
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-variant-numeric: tabular-nums;
+  }
+  .masthead { position: absolute; left: 110px; top: 80px; display: flex; align-items: center; gap: 18px; }
+  .masthead img { height: 54px; }
+  .times { font-size: 26px; color: var(--faint); }
+  .title { margin-left: 14px; }
+  .title b { display: block; font-size: 34px; letter-spacing: -0.02em; }
+  .title span { font-size: 19px; color: var(--soft); }
+  .headline { position: absolute; right: 110px; top: 64px; text-align: right; }
+  .headline b { display: block; font-size: 64px; font-weight: 700; letter-spacing: -0.04em; line-height: 1.05; color: var(--oxide); }
+  .headline span { font-size: 24px; color: var(--soft); }
+  .headline span strong { color: var(--ink); font-weight: 600; }
+  .chart { position: absolute; left: 110px; right: 110px; top: 280px; }
+  .row { display: grid; grid-template-columns: 380px 1fr; align-items: center; gap: 28px; height: 96px; }
+  .name { font-size: 26px; font-weight: 600; }
+  .name small { display: block; font-size: 19px; font-weight: 400; color: var(--soft); margin-top: 4px; }
+  .bar { position: relative; height: 44px; }
+  .fill { height: 100%; border-radius: 10px; }
+  .value { position: absolute; top: 50%; transform: translateY(-50%); font-size: 28px; font-weight: 650; padding-left: 18px; white-space: nowrap; }
+  .stats { position: absolute; left: 110px; right: 110px; top: 610px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .stat { background: var(--card); border: 1px solid var(--hairline); border-radius: 16px; padding: 22px 28px; }
+  .stat b { display: block; font-size: 48px; letter-spacing: -0.03em; line-height: 1; }
+  .stat span { display: block; margin-top: 10px; font-size: 19px; color: var(--soft); line-height: 1.35; }
+  .note { position: absolute; left: 110px; right: 110px; bottom: 56px; display: flex; justify-content: space-between; align-items: flex-end; font-size: 18px; color: var(--faint); }
+  .note b { color: var(--ink); font-size: 21px; font-weight: 600; }
+</style>
+</head>
+<body>
+  <div class="masthead">
+    <img src="../../vendor/fusor-ai/assets/brand/fusor-ai.svg" alt="">
+    <span class="times">×</span>
+    <img src="../brand/moondream.png" alt="">
+    <div class="title"><b>parakeet-redux-wasm</b><span>Moondream Parakeet Redux, speech to text on your CPU</span></div>
+  </div>
+  <div class="headline">
+    <b>116 s of speech,<br>transcribed in 3 s</b>
+    <span><strong>on your CPU</strong>, inside a browser tab</span>
+  </div>
+  <div class="chart" id="chart"></div>
+  <div class="stats">
+    <div class="stat"><b>0.15 s</b><span>from your words to their text,<br>listening live on 8 threads</span></div>
+    <div class="stat"><b>4.7%</b><span>word error rate on the recording,<br>LibriSpeech references</span></div>
+    <div class="stat"><b>0 requests</b><span>after a one-time 199 MB download:<br>audio never leaves the page</span></div>
+  </div>
+  <div class="note">
+    <span>A 116 s recording (ten LibriSpeech utterances) transcribed as a file in Chrome, on the CPU of one Apple M4 Pro.<br>The model: a 1.58-bit parakeet-tdt-0.6b-v3 for 25 European languages, compiled to WebAssembly with fusor-ai.</span>
+    <b>parakeet-stt.fusor.build</b>
+  </div>
+<script>
+  const ROWS = [
+    { name: 'Real time', detail: 'the recording\'s length', seconds: 116, color: 'var(--slate)' },
+    { name: 'parakeet-redux-wasm', detail: 'Chrome, 1 thread', seconds: 16.6, color: 'var(--vermilion)' },
+    { name: 'parakeet-redux-wasm', detail: 'Chrome, 8 threads', seconds: 3.0, color: 'var(--oxide)' },
+  ];
+  const FULL = 116;
+  const chart = document.getElementById('chart');
+  for (const row of ROWS) {
+    const width = (row.seconds / FULL) * 82;
+    chart.insertAdjacentHTML('beforeend', `
+      <div class="row">
+        <div class="name">${row.name}<small>${row.detail}</small></div>
+        <div class="bar">
+          <div class="fill" style="width: ${width}%; background: ${row.color}"></div>
+          <div class="value" style="left: ${width}%">${row.seconds.toFixed(row.seconds < 100 ? 1 : 0)} s</div>
+        </div>
+      </div>`);
+  }
+
+  if (new URLSearchParams(location.search).get('theme') === 'dark') document.documentElement.classList.add('dark');
+</script>
+</body>
+</html>
