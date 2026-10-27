@@ -11,6 +11,8 @@
 
 **116 s of audio transcribed in 3.0 s**, in Chrome on an Apple M4 Pro, eight threads. [Benchmarks](benchmarks.md)
 
+<a href="https://huggingface.co/spaces/fusorlabs/parakeet-redux-wasm"><img src="assets/demo/demo.gif" alt="parakeet-redux-wasm in Chrome: speech transcribed live by Parakeet Redux on the CPU as it is heard, zero network requests" width="720"></a>
+
 Speak, or pick a recording, and read what was said, transcribed by [Moondream Parakeet Redux](https://huggingface.co/moondream/parakeet-redux), a 1.58-bit version of NVIDIA's [parakeet-tdt-0.6b-v3](https://huggingface.co/nvidia/parakeet-tdt-0.6b-v3) for 25 European languages, computed on your own device. No server, no API key, no GPU required, and once the model has loaded, no audio leaves the page.
 
 parakeet-redux-wasm is the app around the model: a [fusor](https://github.com/fusor-rs/fusor) page, the browser runtime and a native CLI. The model itself, compiled to WebAssembly, is built with [fusor-ai](https://github.com/fusor-rs/fusor-ai), the toolkit for AI runtimes in Rust and WebAssembly, from the published weights.
